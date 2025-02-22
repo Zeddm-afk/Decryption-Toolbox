@@ -4,6 +4,38 @@ import base64
 import urllib.parse
 import hashlib
 import os
+class Userinput(object):
+
+    def get_multiline_input(self,prompt):
+        # print(Fore.GREEN + "\'_\':请输入内容，末行输入 'ok' 结束：")
+        print(prompt)
+        lines = []
+        while True:
+            line = input()
+            if line == "ok":  # 输入 'END' 来结束输入
+                break
+            lines.append(line)  # 将每一行添加到列表中
+        return "\n".join(lines)
+
+    def Single_input(self,prompt):
+        user_input = input(prompt)
+        return user_input
+
+    def main(self,whether,prompt='\'_\':请输入内容'):
+        if not whether:whether = 'y'
+        if whether == 'y':
+            answer = self.get_multiline_input(prompt)
+        else:
+            answer = self.Single_input(prompt)
+        return answer
+    def __str__(self):
+        declaration = []
+        declaration.append(r'获取用户输入')
+        declaration.append(r'def:get_multiline_input(self,prompt) return:"\n".join(lines)')
+        declaration.append(r'def:Single_input(self,prompt) return:user_input')
+        declaration.append(r"def:main(self,whether,prompt='\'_\':请输入内容') return:answer")
+        return "\n".join(declaration)
+
 def procedure_start():
     print(r'''
 
@@ -107,34 +139,6 @@ class Md5(object):
 
     def md5_encode(self,original_data):
         pass
-        # url = "https://www.toolhelper.cn/DigestAlgorithm/GetMD5?gts=1737686435000&gv=170&r_=0.45833568328684615"
-        # headers = {
-        #     "Cookie": "__gads=ID=af828d85eb17d25e:T=1737686438:RT=1737686438:S=ALNI_MZN3sN648UZ7ZDKBQiVyM51i7oDoQ; __gpi=UID=000010096359d211:T=1737686438:RT=1737686438:S=ALNI_MbmpMJ1nKu8Vt97pJPi9-mpqoTM0Q; __eoi=ID=5e376bd3fc58e156:T=1737686438:RT=1737686438:S=AA-AfjbnKGJVHmF3Xha1qQAr8e4e",
-        #     "Content-Length": "28",
-        #     "Sec-Ch-Ua": '"Not-A.Brand";v="99", "Chromium";v="124"',
-        #     "Accept": "application/json, text/javascript, */*; q=0.01",
-        #     "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
-        #     "X-Requested-With": "XMLHttpRequest",
-        #     "Sec-Ch-Ua-Mobile": "?0",
-        #     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.6367.60 Safari/537.36",
-        #     "Sec-Ch-Ua-Platform": '"Windows"',
-        #     "Origin": "https://www.toolhelper.cn",
-        #     "Sec-Fetch-Site": "same-origin",
-        #     "Sec-Fetch-Mode": "cors",
-        #     "Sec-Fetch-Dest": "empty",
-        #     "Referer": "https://www.toolhelper.cn/DigestAlgorithm/MD5",
-        #     "Accept-Encoding": "gzip, deflate, br",
-        #     "Accept-Language": "zh-CN,zh;q=0.9",
-        #     "Priority": "u=1, i"
-        # }
-        # post_data = {
-        #     'input' : original_data,
-        #     'encoding' : 'UTF-8'
-        # }
-        # resp = requests.post(url=url,headers=headers,data=post_data).json()
-        # md5_16 = resp["Data"]["MD5_16"]
-        # md5_32 = resp["Data"]["MD5_32"].lower()
-        # return md5_16,md5_32
 
     def md5_encode_2(self,raw_data='123456'):
 
@@ -149,15 +153,15 @@ class Md5(object):
         self.whether = whether
 
         if self.whether == '0':
-            original_data = input('输入待加密字符串\n:')
+            original_data =ins_class.main(whether='n',prompt='待加密数据:')
             self.original_data = original_data
 
             md5_32 = self.md5_encode_2(original_data)
 
-            print('32位md5:'+md5_32)
-            input('---------')
+            print('32位md5:\n'+md5_32)
+            input('----回车-----')
         else:
-            encode_data = input('待解密字符串\n:')
+            encode_data =ins_class.main(whether='n',prompt='待解密数据:')
             self.encode_data = encode_data
             try:
                 id = self.get_sessionID()
@@ -181,21 +185,33 @@ class Unicode(object):
         return unicode_str
 
     def Udecode(self,raw_data):
-        unicode_str = fr"{raw_data}"
-        # 先将字符串编码为字节对象，再解码为普通字符串
-        decoded_str = unicode_str.encode('utf-8').decode('unicode_escape')
-        return decoded_str
-
+        def replace_unicode(match):
+            code = match.group(0)  # 获取匹配到的编码
+            if code.startswith("\\u"):
+                code_point = int(code[2:], 16)  # 去掉 \u，把剩下的 4 个十六进制数字转换成整数
+            elif code.startswith("\\U"):
+                code_point = int(code[2:], 16)  # 去掉 \U，把剩下的 8 个十六进制数字转换成整数
+            return chr(code_point)  # 把整数转换成字符
+        
+        pattern = r"\\u[0-9a-fA-F]{4}|\\U[0-9a-fA-F]{8}"
+        
+        new_text = re.sub(pattern, replace_unicode,raw_data)
+        
+        return new_text
     def main(self):
         whether = input('解密[1] or 加密[0] 默认[1]\n:')
         if not whether: whether = '1'
+
+        more_or_single = input('是否开启多行适配{末行输入ok发送数据}[y/n]:')
+        if not more_or_single:more_or_single = 'y'
+
         if whether == '0':
-            raw_input = input('输入待加密unicode字符串:\n')
+            raw_input = ins_class.main(whether=more_or_single,prompt='输入待加密unicode字符串:')
             encode_str = self.Uencode(raw_data=raw_input)
             # sep 参数，可以指定参数之间的分隔符。如果不想在参数之间添加空格，可以将 sep 设置为空字符串
             print('unicode加密:\n',encode_str,sep='')
         else:
-            raw_input = input('输入待解密unicode字符串:\n')
+            raw_input = ins_class.main(whether=more_or_single,prompt='输入待解密unicode字符串:')
             # raw_input = repr(raw_input)
             decode_str = self.Udecode(raw_data=raw_input)
             print('-------------------------------',decode_str)
@@ -266,6 +282,7 @@ class Url_code(object):
 
 
 if __name__ == '__main__':
+    ins_class = Userinput()
     procedure_start()
     surprise()
     type_dic = {'0':Md5(),'1':Unicode(),'2':Base64(),'3':Url_code()}
