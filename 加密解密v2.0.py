@@ -214,7 +214,7 @@ class Unicode(object):
             raw_input = ins_class.main(whether=more_or_single,prompt='输入待解密unicode字符串:')
             # raw_input = repr(raw_input)
             decode_str = self.Udecode(raw_data=raw_input)
-            print('-------------------------------',decode_str)
+            print('-------------------------------')
             print('unicode解密:\n', decode_str,sep='')
     def __str__(self):
         explain = r'unicode加密《\u738b\u6653\u5170》'
