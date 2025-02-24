@@ -59,3 +59,10 @@ import os
 演示：
 
 ![1](./png/1.png)
+- md5
+
+  ![image-20250224125404080](./png/md5.png)
+
+- unicode
+
+![image-20250224125856378](./png/unicode.png)
